@@ -2,10 +2,14 @@ version: '3.6'
 services:
   app:
     image: golang:latest
+    ports:
+    - "8080:8080"
     volumes:
-      - ./app:/go/src/app
+      - .:/go/src/app
     links:
-      - graphql-engine
+      - postgres
+    working_dir: /go/src/app
+    command: go run server.go
   postgres:
     image: postgres:12
     restart: always
@@ -13,22 +17,6 @@ services:
     - db_data:/var/lib/postgresql/data
     environment:
       POSTGRES_PASSWORD: postgrespassword
-  graphql-engine:
-    image: hasura/graphql-engine:v1.3.3
-    ports:
-    - "8080:8080"
-    depends_on:
-    - "postgres"
-    restart: always
-    environment:
-      HASURA_GRAPHQL_DATABASE_URL: postgres://postgres:postgrespassword@postgres:5432/postgres
-      ## enable the console served by server
-      HASURA_GRAPHQL_ENABLE_CONSOLE: "true" # set to "false" to disable console
-      ## enable debugging mode. It is recommended to disable this in production
-      HASURA_GRAPHQL_DEV_MODE: "true"
-      HASURA_GRAPHQL_ENABLED_LOG_TYPES: startup, http-log, webhook-log, websocket-log, query-log
-      ## uncomment next line to set an admin secret
-      # HASURA_GRAPHQL_ADMIN_SECRET: myadminsecretkey
 volumes:
   db_data:
 
