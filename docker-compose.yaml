@@ -9,15 +9,15 @@ services:
     links:
       - postgres
     working_dir: /go/src/app
-    command: go run server.go
+    command: go run cmd/gqlgen/server.go
   postgres:
     image: postgres:12
     restart: always
     volumes:
     - db_data:/var/lib/postgresql/data
+    ports:
+    - "5432:5432"
     environment:
       POSTGRES_PASSWORD: postgrespassword
 volumes:
   db_data:
-
-

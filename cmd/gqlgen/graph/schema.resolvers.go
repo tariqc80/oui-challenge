@@ -5,18 +5,33 @@ package graph
 
 import (
 	"context"
-	"fmt"
+	"log"
 
-	"github.com/tariqc80/oui-challenge/graph/generated"
-	"github.com/tariqc80/oui-challenge/graph/model"
+	"github.com/tariqc80/oui-challenge/cmd/gqlgen/graph/generated"
+	"github.com/tariqc80/oui-challenge/cmd/gqlgen/graph/model"
 )
 
-func (r *mutationResolver) CreateTodo(ctx context.Context, input model.NewTodo) (*model.Todo, error) {
-	panic(fmt.Errorf("not implemented"))
+func (r *mutationResolver) CreateSet(ctx context.Context, input model.SetInput) (*model.Set, error) {
+	var set *model.Set
+	newid, err := r.Provider.Create(input.Members)
+
+	if err != nil {
+		log.Print(err)
+	} else {
+		set, err = r.Provider.Get(newid)
+	}
+
+	return set, err
 }
 
-func (r *queryResolver) Todos(ctx context.Context) ([]*model.Todo, error) {
-	panic(fmt.Errorf("not implemented"))
+func (r *queryResolver) Sets(ctx context.Context) ([]*model.Set, error) {
+	sets, err := r.Provider.GetCollection()
+
+	if err != nil {
+		log.Print(err)
+	}
+
+	return sets, err
 }
 
 // Mutation returns generated.MutationResolver implementation.

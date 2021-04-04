@@ -1,0 +1,23 @@
+# Oui Challenge
+# Tariq Chaudhry
+#
+# graphql schema
+
+type Set {
+    id: Int!
+    Hash: String!
+    members: [Int!]!
+    intersectingSets: [Set!]!
+}
+
+type Query {
+    sets: [Set!]
+}
+
+input SetInput {
+    members: [Int!]!
+}
+
+type Mutation {
+    createSet(input: SetInput!): Set!
+}
