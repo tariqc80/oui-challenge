@@ -22,33 +22,32 @@ func (a members) Len() int           { return len(a) }
 func (a members) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
 func (a members) Less(i, j int) bool { return a[i] < a[j] }
 
-// Set struct
-type Set struct {
+// Pg struct
+type Pg struct {
 	db *sql.DB
 }
 
-// NewSet creates an instance of Set
-func NewSet(c *config.Config) *Set {
+// NewPg creates an instance of Pg
+func NewPg(c *config.Config) *Pg {
 	str := fmt.Sprintf("postgres://%s:%s@%s:%s/%s?sslmode=disable", c.DatabaseUser, c.DatabasePassword, c.DatabaseHost, c.DatabasePort, c.DatabaseName)
-
 	db, err := sql.Open("postgres", str)
 
 	if err != nil {
 		log.Print(err)
 	}
 
-	return &Set{
+	return &Pg{
 		db: db,
 	}
 }
 
 // Close closes the database
-func (s *Set) Close() {
+func (s *Pg) Close() {
 	s.db.Close()
 }
 
-// Create inserts a new set
-func (s *Set) Create(m members) (int64, error) {
+// CreateSet inserts a new set
+func (s *Pg) CreateSet(m members) (int64, error) {
 	var (
 		id           int64  // id of new set
 		raw          []byte // byte array of members
@@ -89,8 +88,8 @@ func (s *Set) Create(m members) (int64, error) {
 	return id, err
 }
 
-// Get fetches a set with the given id
-func (s *Set) Get(id int64) (*model.Set, error) {
+// GetSet fetches a set with the given id
+func (s *Pg) GetSet(id int64) (*model.Set, error) {
 	var set model.Set
 	var intersets string
 
@@ -110,7 +109,7 @@ GROUP BY a.id
 		return nil, err
 	}
 
-	// set.IntersectingSets =
+	// set.IntersectingPgs =
 	err = row.Err()
 
 	if err != nil {
@@ -120,8 +119,8 @@ GROUP BY a.id
 	return &set, err
 }
 
-// GetCollection queries the database for all the sets
-func (s *Set) GetCollection() ([]*model.Set, error) {
+// GetSetCollection queries the database for all the sets
+func (s *Pg) GetSetCollection() ([]*model.Set, error) {
 	sets := []*model.Set{}
 
 	q := `
@@ -154,7 +153,7 @@ GROUP BY a.id
 		err = json.Unmarshal([]byte(intersectionIds), &intersects)
 
 		for _, id := range intersects {
-			iset, err := s.Get(int64(id.(float64)))
+			iset, err := s.GetSet(int64(id.(float64)))
 
 			if err != nil {
 				log.Print(err)

@@ -13,20 +13,30 @@ import (
 
 func (r *mutationResolver) CreateSet(ctx context.Context, input model.SetInput) (*model.Set, error) {
 	var set *model.Set
-	newid, err := r.Provider.Create(input.Members)
+	newid, err := r.Db.CreateSet(input.Members)
 
 	if err != nil {
 		log.Print(err)
 	} else {
-		set, err = r.Provider.Get(newid)
+		set, err = r.Db.GetSet(newid)
+
+		if err != nil {
+			log.Print(err)
+		}
+
+		err = r.Cache.StoreSet(set)
+
+		if err != nil {
+			log.Print(err)
+		}
 	}
 
 	return set, err
 }
 
 func (r *queryResolver) Sets(ctx context.Context) ([]*model.Set, error) {
-	sets, err := r.Provider.GetCollection()
-
+	// check cache first
+	sets, err := r.Db.GetSetCollection()
 	if err != nil {
 		log.Print(err)
 	}
