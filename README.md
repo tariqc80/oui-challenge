@@ -38,3 +38,8 @@ Used the gqlgen package for the GraphQl server implemented in golang
 https://github.com/99designs/gqlgen
 
 To run using docker-compose, clone the repository and use `docker-compose up`
+and then if you have psql on your host machine, you can setup the database using...
+```
+psql -h 127.0.0.1 -U postgres -f sql/up.sql
+```
+otherwise connect to the postgres container and run it from there
